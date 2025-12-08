@@ -50,6 +50,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           rule-categories: ${{ inputs.categories }}
           create-pr: 'true'
+          pr-labels: 'do-not-merge'
 
   # Comment-triggered test job
   test-comment:
@@ -70,6 +71,7 @@ jobs:
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           create-pr: 'true'
+          pr-labels: 'do-not-merge'
 
   # Scheduled regression test
   test-regression:
