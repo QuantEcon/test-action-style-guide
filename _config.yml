@@ -1,0 +1,44 @@
+# Book settings
+title: Test Action Style Guide
+author: QuantEcon
+logo: _static/qe-logo.png
+
+# Execute notebooks
+execute:
+  execute_notebooks: cache
+  timeout: 600
+
+# Parse settings
+parse:
+  myst_enable_extensions:
+    - amsmath
+    - colon_fence
+    - deflist
+    - dollarmath
+    - html_image
+    - linkify
+    - replacements
+    - smartquotes
+    - substitution
+
+# HTML output settings
+html:
+  use_issues_button: true
+  use_repository_button: true
+  home_page_in_navbar: false
+
+# Repository settings
+repository:
+  url: https://github.com/QuantEcon/test-action-style-guide
+  branch: main
+
+# Launch buttons
+launch_buttons:
+  colab_url: https://colab.research.google.com
+
+# Sphinx configuration
+sphinx:
+  extra_extensions:
+    - sphinx_proof
+  config:
+    mathjax_path: https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
