@@ -30,7 +30,7 @@ The action can be triggered manually from the Actions tab to test specific categ
 
 Create an issue with a comment like:
 ```
-@github-actions style-guide lectures/test-lecture-violations.md --categories math,code
+@qe-style-checker lectures/test-lecture-violations.md math,code
 ```
 
 ## Violation Categories

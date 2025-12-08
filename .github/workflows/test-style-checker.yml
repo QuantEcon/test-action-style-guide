@@ -26,6 +26,10 @@ on:
   # Also trigger on issue comments for testing comment-based triggers
   issue_comment:
     types: [created]
+  
+  # Scheduled regression test (weekly)
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
 
 jobs:
   # Manual test job
@@ -51,7 +55,7 @@ jobs:
   test-comment:
     if: >
       github.event_name == 'issue_comment' &&
-      contains(github.event.comment.body, '@github-actions style-guide')
+      contains(github.event.comment.body, '@qe-style-checker')
     runs-on: ubuntu-latest
     
     steps:
