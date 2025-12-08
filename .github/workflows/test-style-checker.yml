@@ -1,0 +1,101 @@
+name: Test Style Checker
+
+on:
+  # Manual trigger with inputs
+  workflow_dispatch:
+    inputs:
+      lecture:
+        description: 'Lecture file to check'
+        required: true
+        default: 'lectures/test-lecture-violations.md'
+        type: choice
+        options:
+          - 'lectures/test-lecture-violations.md'
+          - 'lectures/test-lecture-clean.md'
+      categories:
+        description: 'Categories to check (comma-separated)'
+        required: false
+        default: 'math,code,writing'
+        type: string
+      action_ref:
+        description: 'action-style-guide ref (branch/tag)'
+        required: false
+        default: 'main'
+        type: string
+  
+  # Also trigger on issue comments for testing comment-based triggers
+  issue_comment:
+    types: [created]
+
+jobs:
+  # Manual test job
+  test-manual:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout test repository
+        uses: actions/checkout@v4
+
+      - name: Run Style Checker
+        uses: QuantEcon/action-style-guide@${{ inputs.action_ref }}
+        with:
+          mode: 'single'
+          file_path: ${{ inputs.lecture }}
+          categories: ${{ inputs.categories }}
+          create_pr: 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  # Comment-triggered test job
+  test-comment:
+    if: >
+      github.event_name == 'issue_comment' &&
+      contains(github.event.comment.body, '@github-actions style-guide')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout test repository
+        uses: actions/checkout@v4
+
+      - name: Run Style Checker
+        uses: QuantEcon/action-style-guide@main
+        with:
+          mode: 'comment'
+          comment_body: ${{ github.event.comment.body }}
+          comment_id: ${{ github.event.comment.id }}
+          issue_number: ${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  # Scheduled regression test
+  test-regression:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        lecture:
+          - 'lectures/test-lecture-violations.md'
+          - 'lectures/test-lecture-clean.md'
+        category:
+          - 'math'
+          - 'code'
+          - 'writing'
+    
+    steps:
+      - name: Checkout test repository
+        uses: actions/checkout@v4
+
+      - name: Run Style Checker - ${{ matrix.lecture }} - ${{ matrix.category }}
+        uses: QuantEcon/action-style-guide@main
+        with:
+          mode: 'single'
+          file_path: ${{ matrix.lecture }}
+          categories: ${{ matrix.category }}
+          create_pr: 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
