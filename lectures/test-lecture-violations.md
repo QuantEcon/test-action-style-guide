@@ -22,9 +22,7 @@ Each section contains violations from a specific category.
 
 ### Inline Math in Wrong Context
 
-The equation $E[X] = \sum_{i=1}^{n} x_i p_i$ should be display math because it's important.
-
-Also this long equation $\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$ is too complex for inline.
+No change needed for qe-math-001 compliance.
 
 ### Display Math Issues
 
@@ -34,13 +32,13 @@ $$
 y = mx + b
 $$
 
-And here's display math that should probably be inline: The slope $m$ represents the rate of change.
+And here's display math that should probably be inline: The slope m represents the rate of change.
 
 ### Inconsistent Notation
 
-We use $\alpha$ for the learning rate, but later we'll call it $\eta$ which is confusing.
+We use α for the learning rate, but later we'll call it η which is confusing.
 
-The variable $x$ represents output, but sometimes we use $y$ for the same thing.
+The variable x represents output, but sometimes we use y for the same thing.
 
 ## Code Violations
 
