@@ -38,15 +38,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Style Checker
-        uses: QuantEcon/action-style-guide@${{ inputs.action_ref }}
+        uses: QuantEcon/action-style-guide@main
         with:
           mode: 'single'
-          file_path: ${{ inputs.lecture }}
-          categories: ${{ inputs.categories }}
-          create_pr: 'false'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          comment-body: '@github-actions style-guide ${{ inputs.lecture }} --categories ${{ inputs.categories }}'
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          rule-categories: ${{ inputs.categories }}
+          create-pr: 'false'
 
   # Comment-triggered test job
   test-comment:
@@ -62,13 +61,11 @@ jobs:
       - name: Run Style Checker
         uses: QuantEcon/action-style-guide@main
         with:
-          mode: 'comment'
-          comment_body: ${{ github.event.comment.body }}
-          comment_id: ${{ github.event.comment.id }}
-          issue_number: ${{ github.event.issue.number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          mode: 'single'
+          comment-body: ${{ github.event.comment.body }}
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          create-pr: 'false'
 
   # Scheduled regression test
   test-regression:
@@ -93,9 +90,8 @@ jobs:
         uses: QuantEcon/action-style-guide@main
         with:
           mode: 'single'
-          file_path: ${{ matrix.lecture }}
-          categories: ${{ matrix.category }}
-          create_pr: 'false'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          comment-body: '@github-actions style-guide ${{ matrix.lecture }} --categories ${{ matrix.category }}'
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          rule-categories: ${{ matrix.category }}
+          create-pr: 'false'
