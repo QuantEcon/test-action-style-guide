@@ -14,6 +14,7 @@ kernelspec:
 # Test Lecture: Style Violations
 
 This lecture contains intentional style violations for testing the QuantEcon Style Checker.
+
 Each section contains violations from a specific category.
 
 **DO NOT FIX THESE VIOLATIONS** - They are intentional test cases.
@@ -34,17 +35,17 @@ $$
 y = mx + b
 $$
 
-And here's display math that should probably be inline: The slope $m$ represents the rate of change.
+And here's display math that should probably be inline.
+
+The slope m represents the **rate of change**.
 
 ### Inconsistent Notation
 
-We use $\alpha$ for the learning rate, but later we'll call it $\eta$ which is confusing.
+We use α for the **learning rate**, but later we'll call it η which is confusing.
 
-The variable $x$ represents output, but sometimes we use $y$ for the same thing.
+The variable x represents output, but sometimes we use y for the same thing.
 
-## Code Violations
-
-### Missing Language Specifier
+In addition to what's in Anaconda, this lecture will need the following libraries:
 
 ```
 def hello():
@@ -75,22 +76,36 @@ very_long_variable_name_that_makes_the_line_exceed_recommended_length = some_fun
 
 ### Contractions
 
-We don't use contractions in formal writing. It's not appropriate and doesn't look professional.
-You shouldn't use them either. They won't be accepted in the style guide.
+We don't use contractions in formal writing.
+
+It's not appropriate and doesn't look professional.
+
+You shouldn't use them either.
+
+They won't be accepted in the style guide.
 
 ### Passive Voice
 
-The model was trained on the dataset. The results were analyzed by the researchers.
-It was determined that the algorithm is effective. The paper was written last year.
+The model was trained on the dataset.
+
+The results were analyzed by the researchers.
+
+It was determined that the algorithm is effective.
+
+The paper was written last year.
 
 ### Informal Language
 
 So basically, this algorithm is pretty cool and works really well.
+
 Anyway, let's move on to the next section which is kinda important.
 
 ### Second Person
 
-You should understand this concept before proceeding. If you don't get it, you can review the previous section.
+You should understand this concept before proceeding.
+
+If you don't get it, you can review the previous section.
+
 When you implement this, make sure you test your code thoroughly.
 
 ## Figures Violations
@@ -103,7 +118,9 @@ When you implement this, make sure you test your code thoroughly.
 This is a figure caption.
 ```
 
-The figure above shows the results. But we never reference {numref}`fig-example-1` properly in the text flow.
+The figure above shows the results.
+
+But we never reference {numref}`fig-example-1` properly in the text flow.
 
 ### Caption Issues
 
@@ -126,6 +143,7 @@ A detailed analysis of the time series data showing the correlation between vari
 ### Bare URLs
 
 Check out https://quantecon.org for more information.
+
 Also see http://example.com/some/long/path/to/resource for details.
 
 ### Poor Link Text
