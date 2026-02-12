@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Style Checker
-        uses: QuantEcon/action-style-guide@main
+        uses: QuantEcon/action-style-guide@cleanup/dead-code-docs-tests
         with:
           mode: 'single'
           comment-body: '@github-actions style-guide ${{ inputs.lecture }} --categories ${{ inputs.categories }}'
@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Style Checker
-        uses: QuantEcon/action-style-guide@main
+        uses: QuantEcon/action-style-guide@cleanup/dead-code-docs-tests
         with:
           mode: 'single'
           comment-body: ${{ github.event.comment.body }}
@@ -93,7 +93,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Style Checker - ${{ matrix.lecture }} - ${{ matrix.category }}
-        uses: QuantEcon/action-style-guide@main
+        uses: QuantEcon/action-style-guide@cleanup/dead-code-docs-tests
         with:
           mode: 'single'
           comment-body: '@github-actions style-guide ${{ matrix.lecture }} --categories ${{ matrix.category }}'
