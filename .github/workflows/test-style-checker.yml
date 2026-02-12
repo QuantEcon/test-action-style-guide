@@ -45,7 +45,7 @@ jobs:
         uses: QuantEcon/action-style-guide@main
         with:
           mode: 'single'
-          comment-body: '@github-actions style-guide ${{ inputs.lecture }} --categories ${{ inputs.categories }}'
+          comment-body: '@qe-style-checker ${{ inputs.lecture }} ${{ inputs.categories }}'
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           rule-categories: ${{ inputs.categories }}
@@ -96,7 +96,7 @@ jobs:
         uses: QuantEcon/action-style-guide@main
         with:
           mode: 'single'
-          comment-body: '@github-actions style-guide ${{ matrix.lecture }} --categories ${{ matrix.category }}'
+          comment-body: '@qe-style-checker ${{ matrix.lecture }} ${{ matrix.category }}'
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           rule-categories: ${{ matrix.category }}
