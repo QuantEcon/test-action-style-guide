@@ -42,6 +42,10 @@ We use $\alpha$ for the learning rate, but later we'll call it $\eta$ which is c
 
 The variable $x$ represents output, but sometimes we use $y$ for the same thing.
 
+### Multi-Rule Overlap (Math + Writing)
+
+The discount factor $\beta$ is typically between 0 and 1. The risk aversion parameter $\gamma$ determines the curvature. Together $\beta$ and $\gamma$ shape the agent's preferences in our model.
+
 ## Code Violations
 
 ### Missing Language Specifier
