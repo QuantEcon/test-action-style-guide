@@ -34,13 +34,13 @@ $$
 y = mx + b
 $$
 
-And here's display math that should probably be inline: The slope $m$ represents the rate of change.
+And here's display math that should probably be inline: The slope m represents the rate of change.
 
 ### Inconsistent Notation
 
-We use $\alpha$ for the learning rate, but later we'll call it $\eta$ which is confusing.
+We use α for the learning rate, but later we'll call it η which is confusing.
 
-The variable $x$ represents output, but sometimes we use $y$ for the same thing.
+The variable x represents output, but sometimes we use y for the same thing.
 
 ## Code Violations
 
