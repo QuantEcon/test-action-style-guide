@@ -1,0 +1,4 @@
+# Ephemeral test outputs
+scripts/last_response.md
+lectures/qestyle*.md
+__pycache__/

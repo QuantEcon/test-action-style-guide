@@ -21,8 +21,10 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 MODEL = "claude-sonnet-4-5-20250929"
-TEMPERATURE = 0.0
+TEMPERATURE = 1.0  # Required when using extended thinking
 MAX_TOKENS = 64000
+USE_EXTENDED_THINKING = True  # Let Claude reason internally before outputting
+THINKING_BUDGET = 10000  # Max tokens for internal reasoning
 
 # ---------------------------------------------------------------------------
 # PROMPT — This is the base prompt sent to the LLM.
@@ -30,104 +32,45 @@ MAX_TOKENS = 64000
 # ---------------------------------------------------------------------------
 
 PROMPT = """
-# QuantEcon Writing Style Checker Prompt
+You are a style checker for QuantEcon lecture files written in MyST Markdown.
 
-You are an expert technical writing editor specializing in QuantEcon lecture materials. Your task is to review a lecture document for violations of **one specific writing style rule** and provide actionable suggestions for improvement.
+## Task
 
-## Your Role
+Find all violations of the provided rule in the lecture document.
 
-You will receive:
-1. **One specific writing style rule** to check
-2. **A lecture document** to review
+First, silently analyze the entire document and identify candidate violations.
+Then, verify each candidate — confirm the current text actually violates the rule and the fix changes the text.
+Only include confirmed violations in your response. Report 0 if none exist.
 
-The rule's `Type:` field indicates how to apply it:
-- **`rule`**: Mechanical, objective violations - report all instances found
-- **`style`**: Subjective, advisory guidelines - use judgment, only report significant issues
-
-## Instructions
-
-1. **Check ONLY the specific rule provided**: Do not check for other writing issues, even if you notice them. Focus exclusively on the single rule you receive.
-
-2. **Ignore content outside the rule's scope**: Do not check math notation, code blocks, figures, references, or links unless the specific rule applies to them.
-
-3. **Read the entire lecture carefully** to understand its context before identifying violations.
-
-4. **Be thorough and systematic** in checking the specific rule throughout the entire document.
-
-5. **For each violation found**, provide:
-   - **Rule Code and Title**: The rule ID and title exactly as provided
-   - **Location**: Line number(s) or section heading where the violation occurs
-   - **Current Text**: Quote the problematic text exactly as it appears
-   - **Issue**: Brief explanation of why this violates the rule
-   - **Suggested Fix**: Specific corrected version of the text
-
-6. **Apply the rule appropriately**:
-   - **`rule` type**: Report all clear violations mechanically
-   - **`style` type**: Use judgment - only report when significantly impacting readability
-   - Always explain your reasoning clearly
-
-## Output Format
-
-**CRITICAL**: You MUST structure your response EXACTLY as shown below. The automated parser requires this precise format.
+## Response Format
 
 ```markdown
 # Review Results
 
 ## Summary
-[Brief 1-2 sentence summary of your findings for this specific rule]
+[1-2 sentence summary]
 
 ## Issues Found
-[JUST THE NUMBER - e.g., 3]
+[NUMBER ONLY]
 
 ## Violations
 
 ### Violation 1: [rule-code] - [Rule Title]
-
 **Severity:** error
-
-**Location:** Line [X-Y] / Section "[Section Name]"
-
-**Description:** [Brief explanation of how this violates the specific rule]
-
+**Location:** Line [X] / Section "[name]"
+**Description:** [Why this violates the rule]
 **Current text:**
 ~~~markdown
-[Exact quote of the problematic text - can be multiple lines]
+[exact quote]
 ~~~
-
 **Suggested fix:**
 ~~~markdown
-[The corrected version of the text]
+[corrected version — MUST be different from current text]
 ~~~
-
-**Explanation:** [Why this change fixes the violation]
-
-[Continue for ALL violations found...]
+**Explanation:** [Why this fix resolves the violation]
 ```
 
-**CRITICAL FORMATTING RULES:**
-
-1. **Issues Found**: Must contain ONLY a number (e.g., `3`, not `3 issues found`)
-2. **Violation numbering**: Use sequential numbers (Violation 1, Violation 2, etc.)
-3. **Severity levels**: Use `error` for `rule` type, `warning` or `info` for `style` type
-4. **Code blocks**: Current text and Suggested fix MUST be in triple-tilde fenced blocks (`~~~markdown`)
-5. **Do NOT include** a "Corrected Content" section - fixes will be applied programmatically
-6. **Do NOT deviate** from this structure - the parser depends on it
-7. **Do NOT report** violations of other rules - only the specific rule provided
-8. **NEVER report a violation where the suggested fix is identical to the current text.** If you cannot propose a concrete change that modifies the text, then no violation exists — do NOT report it. A violation means something must change.
-
-**Important**: If NO violations are found for the specific rule, return ONLY this response:
-
-```markdown
-# Review Results
-
-## Summary
-No violations found for [rule-code]. The lecture follows this rule correctly.
-
-## Issues Found
-0
-```
-
-**CRITICAL**: When Issues Found is 0, do NOT include a Violations section. Do NOT create violation blocks with "No change needed" or similar commentary as the suggested fix — this causes content to be deleted.
+If Issues Found is 0, do not include a Violations section.
 """.strip()
 
 # ---------------------------------------------------------------------------
@@ -231,6 +174,8 @@ def main():
 
     print(f"📋 Model: {MODEL}")
     print(f"🌡️  Temperature: {TEMPERATURE}")
+    if USE_EXTENDED_THINKING:
+        print(f"🧠 Extended thinking: enabled (budget: {THINKING_BUDGET} tokens)")
     print(f"📄 Lecture: {lecture_path} ({len(lecture_content)} chars)")
     print(f"📏 Rule: {RULE.splitlines()[1].split(':')[1].strip()}")
     print(f"📨 Full prompt: {len(full_prompt)} chars")
@@ -245,30 +190,56 @@ def main():
 
     client = Anthropic(api_key=api_key)
 
+    # Build API kwargs
+    api_kwargs = dict(
+        model=MODEL,
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
+        messages=[{"role": "user", "content": full_prompt}],
+    )
+    if USE_EXTENDED_THINKING:
+        api_kwargs["thinking"] = {
+            "type": "enabled",
+            "budget_tokens": THINKING_BUDGET,
+        }
+
     try:
-        response = client.messages.create(
-            model=MODEL,
-            max_tokens=MAX_TOKENS,
-            temperature=TEMPERATURE,
-            messages=[{"role": "user", "content": full_prompt}]
-        )
-        raw_response = response.content[0].text
+        response = client.messages.create(**api_kwargs)
+        # With extended thinking, response has thinking + text blocks
+        raw_response = ""
+        thinking_text = ""
+        for block in response.content:
+            if block.type == "thinking":
+                thinking_text = block.thinking
+            elif block.type == "text":
+                raw_response = block.text
         usage = response.usage
     except Exception as e:
         if "Streaming is required" in str(e) or "10 minutes" in str(e):
             print("📡 Using streaming mode...")
             raw_response = ""
-            with client.messages.stream(
-                model=MODEL,
-                max_tokens=MAX_TOKENS,
-                temperature=TEMPERATURE,
-                messages=[{"role": "user", "content": full_prompt}]
-            ) as stream:
-                for text in stream.text_stream:
-                    raw_response += text
+            thinking_text = ""
+            stream_kwargs = {k: v for k, v in api_kwargs.items()}
+            with client.messages.stream(**stream_kwargs) as stream:
+                for event in stream:
+                    if hasattr(event, 'type'):
+                        if event.type == 'content_block_delta':
+                            if hasattr(event.delta, 'thinking'):
+                                thinking_text += event.delta.thinking
+                            elif hasattr(event.delta, 'text'):
+                                raw_response += event.delta.text
             usage = None
         else:
             raise
+
+    # Print thinking (if available)
+    if thinking_text:
+        print("=" * 60)
+        print("THINKING (internal reasoning)")
+        print("=" * 60)
+        print(thinking_text[:2000] + ("..." if len(thinking_text) > 2000 else ""))
+        print(f"\n(Total thinking: {len(thinking_text)} chars)")
+        print()
 
     # Print stats
     print("=" * 60)
