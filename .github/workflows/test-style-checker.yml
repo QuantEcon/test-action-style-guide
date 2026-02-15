@@ -12,6 +12,7 @@ on:
         options:
           - 'lectures/test-lecture-violations.md'
           - 'lectures/test-lecture-clean.md'
+          - 'lectures/markov_chains_jax.md'
       categories:
         description: 'Categories to check (comma-separated)'
         required: false
