@@ -16,7 +16,11 @@ kernelspec:
 
 ## Overview
 
-Markov chains are one of the most useful classes of stochastic processes in economics and finance. They provide a framework for modeling systems that transition between states over time, where the future state depends only on the current state. This property is known as the **Markov property**, and it simplifies analysis considerably while still capturing rich dynamics.
+Markov chains are one of the most useful classes of stochastic processes in economics and finance.
+
+They provide a framework for modeling systems that transition between states over time, where the future state depends only on the current state.
+
+This property is known as the **Markov property**, and it simplifies analysis considerably while still capturing rich dynamics.
 
 In this lecture we study finite Markov chains, their long-run behavior, and compute stationary distributions using JAX for high-performance computation.
 
@@ -30,6 +34,9 @@ We will cover the following topics:
 In addition to what's in Anaconda, this lecture will need the following libraries:
 
 ```{code-cell} ipython3
+---
+tags: [hide-output]
+---
 !pip install quantecon
 ```
 
@@ -41,9 +48,9 @@ import matplotlib.pyplot as plt
 import quantecon as qe
 ```
 
-## Definitions and Setup
+## Definitions and setup
 
-### Stochastic Matrices
+### Stochastic matrices
 
 A **stochastic matrix** is an $n \times n$ square matrix $P$ such that each element is nonnegative and each row sums to one.
 
@@ -51,7 +58,7 @@ Each row of $P$ can be regarded as a probability mass function over $n$ possible
 
 It is not difficult to show that if $P$ is a stochastic matrix, then so is $P^k$ for all $k \in \mathbb{N}$.
 
-### The Markov Property
+### The Markov property
 
 A **Markov chain** $\{X_t\}$ on a finite state space $S = \{x_1, \ldots, x_n\}$ is a sequence of random variables satisfying
 
@@ -59,7 +66,7 @@ $$
 \mathbb{P}\{X_{t+1} = y \mid X_t\} = \mathbb{P}\{X_{t+1} = y \mid X_t, X_{t-1}, \ldots\}
 $$
 
-In other words, knowing the Current State is enough to determine probabilities for future states.
+In other words, knowing the current state is enough to determine probabilities for future states.
 
 The dynamics are fully characterized by the **transition probabilities**
 
@@ -69,7 +76,7 @@ $$
 
 We can view $P$ as a stochastic matrix where $P_{ij} = P(x_i, x_j)$.
 
-## An Employment Model
+## An employment model
 
 Consider a worker who at any given time $t$ is either unemployed (state 0) or employed (state 1).
 
@@ -78,30 +85,32 @@ Suppose that, over a one month period,
 1. An unemployed worker finds a job with probability $\alpha \in (0, 1)$.
 1. An employed worker loses her job and becomes unemployed with probability $\beta \in (0, 1)$.
 
-The Transition Matrix is
+The transition matrix is
 
 $$
-P = \begin{pmatrix}
+P = \begin{bmatrix}
 1 - \alpha & \alpha \\
 \beta & 1 - \beta
-\end{pmatrix}
+\end{bmatrix}
 $$
 
-Once we have the values of $\alpha$ and $\beta$, we can address questions like what is the average duration of unemployment, and what fraction of time does a worker spend unemployed in the long run. These are basically the questions we want to answer in this lecture.
+Once we have the values of $\alpha$ and $\beta$, we can address questions like what is the average duration of unemployment, and what fraction of time does a worker spend unemployed in the long run.
+
+These are basically the questions we want to answer in this lecture.
 
 Let's set up the model with specific parameter values.
 
 ```{code-cell} ipython3
-alpha = 0.3    # probability of finding a job
-beta = 0.2     # probability of losing a job
+α = 0.3    # probability of finding a job
+β = 0.2     # probability of losing a job
 
-P = np.array([[1 - alpha, alpha],
-              [beta, 1 - beta]])
+P = np.array([[1 - α, α],
+              [β, 1 - β]])
 
 print(P)
 ```
 
-## Simulating Markov Chains
+## Simulating Markov chains
 
 To simulate a Markov chain, we need its stochastic matrix $P$ and an initial distribution $\psi_0$ from which to draw $X_0$.
 
@@ -156,7 +165,7 @@ end_time = time.time()
 print(f"QuantEcon simulation: {end_time - start_time:.4f} seconds")
 ```
 
-## Stationary Distributions
+## Stationary distributions
 
 ### Theory
 
@@ -167,12 +176,12 @@ Some distributions are invariant under this operation.
 A distribution $\psi^*$ is called **stationary** (or invariant) for $P$ if
 
 $$
-\psi^* = \psi^* P \tag{1}
-$$
+\psi^* = \psi^* P
+$$ (stationary-dist)
 
 Stationary distributions have an important interpretation: if the distribution of $X_0$ is stationary, then $X_t$ has this same distribution for all $t$.
 
-Hence stationary distributions represent **Stochastic Steady States**.
+Hence stationary distributions represent *stochastic steady states*.
 
 **Theorem.** If $P$ is both aperiodic and irreducible, then
 
@@ -181,9 +190,9 @@ Hence stationary distributions represent **Stochastic Steady States**.
 
 For a proof, see, for example, theorem 5.2 of {cite}`haggstrom2002finite`.
 
-### Computing the Stationary Distribution
+### Computing the stationary distribution
 
-For our employment model, we can find the Stationary Distribution analytically.
+For our employment model, we can find the stationary distribution analytically.
 
 Using $\psi^* = \psi^* P$ and some algebra yields
 
@@ -195,14 +204,16 @@ Let's verify this numerically using QuantEcon.
 
 ```{code-cell} ipython3
 mc = qe.MarkovChain(P)
-psi_star = mc.stationary_distributions[0]
-print(f"Stationary distribution: {psi_star}")
-print(f"Theoretical: [{beta/(alpha+beta):.4f}, {alpha/(alpha+beta):.4f}]")
+ψ_star = mc.stationary_distributions[0]
+print(f"Stationary distribution: {ψ_star}")
+print(f"Theoretical: [{β/(α+β):.4f}, {α/(α+β):.4f}]")
 ```
 
-### Convergence to Stationarity
+### Convergence to stationarity
 
-Part 2 of the convergence theorem tells us that the marginal distribution of $X_t$ converges to $\psi^*$ regardless of the initial condition. This is a powerful result.
+Part 2 of the convergence theorem tells us that the marginal distribution of $X_t$ converges to $\psi^*$ regardless of the initial condition.
+
+This is a powerful result.
 
 The convergence is illustrated in the next figure.
 
@@ -213,7 +224,7 @@ P_hamilton = np.array([
     [0.000, 0.508, 0.492]
 ])
 
-psi = np.array([0.0, 0.2, 0.8])
+ψ = np.array([0.0, 0.2, 0.8])
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.set_title("Convergence to Stationary Distribution")
@@ -252,7 +263,9 @@ As shown in {numref}`convergence-plot`, the initial condition doesn't matter for
 
 ## Computing with JAX
 
-JAX provides significant performance advantages for iterative computations. Let's use it to compute stationary distributions via the Power Method.
+JAX provides significant performance advantages for iterative computations.
+
+Let's use it to compute stationary distributions via the Power Method.
 
 ```{code-cell} ipython3
 import jax.numpy as jnp
@@ -266,7 +279,7 @@ P_large = np.random.dirichlet(np.ones(n), size=n)
 P_large = jnp.array(P_large)
 ```
 
-### The Power Method
+### The power method
 
 The power method computes $\psi^*$ by repeatedly applying $\psi \leftarrow \psi P$ until convergence.
 
@@ -281,22 +294,22 @@ class StationarySolver:
         self.n = P.shape[0]
     
     def solve(self):
-        psi = jnp.ones(self.n) / self.n
+        ψ = jnp.ones(self.n) / self.n
         for i in range(self.max_iter):
-            psi_new = psi @ self.P
-            if jnp.max(jnp.abs(psi_new - psi)) < self.tol:
-                return psi_new, i + 1
-            psi = psi_new
-        return psi, self.max_iter
+            ψ_new = ψ @ self.P
+            if jnp.max(jnp.abs(ψ_new - ψ)) < self.tol:
+                return ψ_new, i + 1
+            ψ = ψ_new
+        return ψ, self.max_iter
 ```
 
 Let's test it.
 
 ```{code-cell} ipython3
 solver = StationarySolver(P_large)
-psi_star, iterations = solver.solve()
+ψ_star, iterations = solver.solve()
 print(f"Converged in {iterations} iterations")
-print(f"Distribution sums to: {jnp.sum(psi_star):.10f}")
+print(f"Distribution sums to: {jnp.sum(ψ_star):.10f}")
 ```
 
 ### JIT-compiled version
@@ -333,7 +346,7 @@ end_time = time.time()
 print(f"JAX power method: {end_time - start_time:.4f} seconds")
 ```
 
-### Using jax.lax.scan for Efficient Iteration
+### Using jax.lax.scan for efficient iteration
 
 For proper JAX-style iteration, we should use `jax.lax.scan` instead of Python loops.
 
@@ -355,26 +368,28 @@ A much better JAX-idiomatic approach is
 @jit
 def power_method_scan(P, num_steps=1000):
     n = P.shape[0]
-    psi_0 = jnp.ones(n) / n
+    ψ_0 = jnp.ones(n) / n
     
-    def step(psi, _):
-        psi_new = psi @ P
-        return psi_new, psi
+    def step(ψ, _):
+        ψ_new = ψ @ P
+        return ψ_new, ψ
     
-    psi_final, psi_history = jax.lax.scan(step, psi_0, jnp.arange(num_steps))
-    return psi_final, psi_history
+    ψ_final, ψ_history = jax.lax.scan(step, ψ_0, jnp.arange(num_steps))
+    return ψ_final, ψ_history
 ```
 
 ```{code-cell} ipython3
-psi_final, history = power_method_scan(P_large)
-print(f"Final distribution sums to: {jnp.sum(psi_final):.10f}")
+ψ_final, history = power_method_scan(P_large)
+print(f"Final distribution sums to: {jnp.sum(ψ_final):.10f}")
 ```
 
-## A Larger Economic Model
+## A larger economic model
 
 To demonstrate the power of JAX, let's consider a more complex model of income dynamics following {cite:t}`StokeyLucas1989`.
 
-Consider a model where workers transition between income quartiles. The model uses a $4 \times 4$ transition matrix.
+Consider a model where workers transition between income quartiles.
+
+The model uses a $4 \times 4$ transition matrix.
 
 Click [here](https://quantecon.org) to learn more about income dynamics models.
 
@@ -410,17 +425,17 @@ for label, prob in zip(quartile_labels, psi):
 
 **Note:** The stationary distribution gives us the long-run fraction of the population in each income quartile.
 
-The income transition matrix $\mathbf{P}$ can be decomposed as
+The income transition matrix $P$ can be decomposed as
 
 $$
-\mathbf{P} = \mathbf{L} \mathbf{D} \mathbf{L}^T
+P = L D L^\top
 $$
 
-where $\mathbf{L}$ is a lower triangular matrix and $\mathbf{D}$ is diagonal.
+Here $L$ is a lower triangular matrix and $D$ is diagonal.
 
-This spectral decomposition helps us understand the Rate of Convergence to the stationary distribution.
+This spectral decomposition helps us understand the rate of convergence to the stationary distribution.
 
-The eigenvalues of $P^T$ determine how quickly the distribution converges.
+The eigenvalues of $P^\top$ determine how quickly the distribution converges.
 
 ```{code-cell} ipython3
 eigenvalues = np.linalg.eigvals(income_P.T)
@@ -434,7 +449,7 @@ The largest eigenvalue is always 1 (corresponding to the stationary distribution
 ````{exercise}
 :label: mc-jax-ex1
 
-Consider the following model of Economic Growth where a country can be in one of three states: recession (state 0), normal growth (state 1), or boom (state 2).
+Consider the following model of economic growth where a country can be in one of three states: recession (state 0), normal growth (state 1), or boom (state 2).
 
 The transition matrix is given by Hamilton {cite}`Hamilton2005`.
 
@@ -486,7 +501,9 @@ for i, label in enumerate(["Recession", "Normal", "Boom"]):
 ```{exercise}
 :label: mc-jax-ex2
 
-Write a function using `jax.lax.fori_loop` that computes $\psi P^t$ for a given initial distribution $\psi$ and transition matrix $P$, returning the distribution at each time step. Compare the performance with a pure Python loop.
+Write a function using `jax.lax.fori_loop` that computes $\psi P^t$ for a given initial distribution $\psi$ and transition matrix $P$, returning the distribution at each time step.
+
+Compare the performance with a pure Python loop.
 ```
 
 ```{solution-start} mc-jax-ex2
