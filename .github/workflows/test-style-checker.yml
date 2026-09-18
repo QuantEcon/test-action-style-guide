@@ -40,7 +40,7 @@ jobs:
     
     steps:
       - name: Checkout test repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Run Style Checker
         uses: QuantEcon/action-style-guide@main
@@ -62,7 +62,7 @@ jobs:
     
     steps:
       - name: Checkout test repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Run Style Checker
         uses: QuantEcon/action-style-guide@main
@@ -91,7 +91,7 @@ jobs:
     
     steps:
       - name: Checkout test repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Run Style Checker - ${{ matrix.lecture }} - ${{ matrix.category }}
         uses: QuantEcon/action-style-guide@main
