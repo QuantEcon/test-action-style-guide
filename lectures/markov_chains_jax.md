@@ -16,7 +16,9 @@ kernelspec:
 
 ## Overview
 
-Markov chains are one of the most useful classes of stochastic processes in economics and finance. They provide a framework for modeling systems that transition between states over time, where the future state depends only on the current state. This property is known as the **Markov property**, and it simplifies analysis considerably while still capturing rich dynamics.
+Markov chains are one of the most useful classes of stochastic processes in economics and finance.
+
+They provide a framework for modeling systems that transition between states over time, where the future state depends only on the current state. This property is known as the **Markov property**, and it simplifies analysis considerably while still capturing rich dynamics.
 
 In this lecture we study finite Markov chains, their long-run behavior, and compute stationary distributions using JAX for high-performance computation.
 
@@ -41,9 +43,9 @@ import matplotlib.pyplot as plt
 import quantecon as qe
 ```
 
-## Definitions and Setup
+## Definitions and setup
 
-### Stochastic Matrices
+### Stochastic matrices
 
 A **stochastic matrix** is an $n \times n$ square matrix $P$ such that each element is nonnegative and each row sums to one.
 
@@ -51,7 +53,7 @@ Each row of $P$ can be regarded as a probability mass function over $n$ possible
 
 It is not difficult to show that if $P$ is a stochastic matrix, then so is $P^k$ for all $k \in \mathbb{N}$.
 
-### The Markov Property
+### The Markov property
 
 A **Markov chain** $\{X_t\}$ on a finite state space $S = \{x_1, \ldots, x_n\}$ is a sequence of random variables satisfying
 
@@ -59,7 +61,7 @@ $$
 \mathbb{P}\{X_{t+1} = y \mid X_t\} = \mathbb{P}\{X_{t+1} = y \mid X_t, X_{t-1}, \ldots\}
 $$
 
-In other words, knowing the Current State is enough to determine probabilities for future states.
+In other words, knowing the current state is enough to determine probabilities for future states.
 
 The dynamics are fully characterized by the **transition probabilities**
 
@@ -69,7 +71,7 @@ $$
 
 We can view $P$ as a stochastic matrix where $P_{ij} = P(x_i, x_j)$.
 
-## An Employment Model
+## An employment model
 
 Consider a worker who at any given time $t$ is either unemployed (state 0) or employed (state 1).
 
@@ -78,7 +80,7 @@ Suppose that, over a one month period,
 1. An unemployed worker finds a job with probability $\alpha \in (0, 1)$.
 1. An employed worker loses her job and becomes unemployed with probability $\beta \in (0, 1)$.
 
-The Transition Matrix is
+The transition matrix is
 
 $$
 P = \begin{pmatrix}
@@ -87,7 +89,9 @@ P = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-Once we have the values of $\alpha$ and $\beta$, we can address questions like what is the average duration of unemployment, and what fraction of time does a worker spend unemployed in the long run. These are basically the questions we want to answer in this lecture.
+Once we have the values of $\alpha$ and $\beta$, we can address questions like what is the average duration of unemployment, and what fraction of time does a worker spend unemployed in the long run.
+
+These are basically the questions we want to answer in this lecture.
 
 Let's set up the model with specific parameter values.
 
@@ -101,7 +105,7 @@ P = np.array([[1 - alpha, alpha],
 print(P)
 ```
 
-## Simulating Markov Chains
+## Simulating Markov chains
 
 To simulate a Markov chain, we need its stochastic matrix $P$ and an initial distribution $\psi_0$ from which to draw $X_0$.
 
@@ -156,7 +160,7 @@ end_time = time.time()
 print(f"QuantEcon simulation: {end_time - start_time:.4f} seconds")
 ```
 
-## Stationary Distributions
+## Stationary distributions
 
 ### Theory
 
@@ -172,7 +176,7 @@ $$
 
 Stationary distributions have an important interpretation: if the distribution of $X_0$ is stationary, then $X_t$ has this same distribution for all $t$.
 
-Hence stationary distributions represent **Stochastic Steady States**.
+Hence stationary distributions represent **stochastic steady states**.
 
 **Theorem.** If $P$ is both aperiodic and irreducible, then
 
@@ -181,9 +185,9 @@ Hence stationary distributions represent **Stochastic Steady States**.
 
 For a proof, see, for example, theorem 5.2 of {cite}`haggstrom2002finite`.
 
-### Computing the Stationary Distribution
+### Computing the stationary distribution
 
-For our employment model, we can find the Stationary Distribution analytically.
+For our employment model, we can find the stationary distribution analytically.
 
 Using $\psi^* = \psi^* P$ and some algebra yields
 
@@ -200,9 +204,11 @@ print(f"Stationary distribution: {psi_star}")
 print(f"Theoretical: [{beta/(alpha+beta):.4f}, {alpha/(alpha+beta):.4f}]")
 ```
 
-### Convergence to Stationarity
+### Convergence to stationarity
 
-Part 2 of the convergence theorem tells us that the marginal distribution of $X_t$ converges to $\psi^*$ regardless of the initial condition. This is a powerful result.
+Part 2 of the convergence theorem tells us that the marginal distribution of $X_t$ converges to $\psi^*$ regardless of the initial condition.
+
+This is a powerful result.
 
 The convergence is illustrated in the next figure.
 
@@ -243,7 +249,7 @@ plt.show()
 ```{figure} /_static/lecture_specific/markov_chains/convergence_plot.png
 :name: convergence-plot
 
-Convergence of Marginal Distributions to the Stationary Distribution for Hamilton's Recession Model
+Convergence of marginal distributions to the stationary distribution for Hamilton's Recession Model
 ```
 
 The figure above shows how the distribution converges over time.
@@ -252,7 +258,9 @@ As shown in {numref}`convergence-plot`, the initial condition doesn't matter for
 
 ## Computing with JAX
 
-JAX provides significant performance advantages for iterative computations. Let's use it to compute stationary distributions via the Power Method.
+JAX provides significant performance advantages for iterative computations.
+
+Let's use it to compute stationary distributions via the Power Method.
 
 ```{code-cell} ipython3
 import jax.numpy as jnp
@@ -266,7 +274,7 @@ P_large = np.random.dirichlet(np.ones(n), size=n)
 P_large = jnp.array(P_large)
 ```
 
-### The Power Method
+### The power method
 
 The power method computes $\psi^*$ by repeatedly applying $\psi \leftarrow \psi P$ until convergence.
 
@@ -333,7 +341,7 @@ end_time = time.time()
 print(f"JAX power method: {end_time - start_time:.4f} seconds")
 ```
 
-### Using jax.lax.scan for Efficient Iteration
+### Using jax.lax.scan for efficient iteration
 
 For proper JAX-style iteration, we should use `jax.lax.scan` instead of Python loops.
 
@@ -370,11 +378,13 @@ psi_final, history = power_method_scan(P_large)
 print(f"Final distribution sums to: {jnp.sum(psi_final):.10f}")
 ```
 
-## A Larger Economic Model
+## A larger economic model
 
 To demonstrate the power of JAX, let's consider a more complex model of income dynamics following {cite:t}`StokeyLucas1989`.
 
-Consider a model where workers transition between income quartiles. The model uses a $4 \times 4$ transition matrix.
+Consider a model where workers transition between income quartiles.
+
+The model uses a $4 \times 4$ transition matrix.
 
 Click [here](https://quantecon.org) to learn more about income dynamics models.
 
@@ -418,7 +428,7 @@ $$
 
 where $\mathbf{L}$ is a lower triangular matrix and $\mathbf{D}$ is diagonal.
 
-This spectral decomposition helps us understand the Rate of Convergence to the stationary distribution.
+This spectral decomposition helps us understand the rate of convergence to the stationary distribution.
 
 The eigenvalues of $P^T$ determine how quickly the distribution converges.
 
@@ -434,7 +444,7 @@ The largest eigenvalue is always 1 (corresponding to the stationary distribution
 ````{exercise}
 :label: mc-jax-ex1
 
-Consider the following model of Economic Growth where a country can be in one of three states: recession (state 0), normal growth (state 1), or boom (state 2).
+Consider the following model of economic growth where a country can be in one of three states: recession (state 0), normal growth (state 1), or boom (state 2).
 
 The transition matrix is given by Hamilton {cite}`Hamilton2005`.
 
@@ -486,7 +496,9 @@ for i, label in enumerate(["Recession", "Normal", "Boom"]):
 ```{exercise}
 :label: mc-jax-ex2
 
-Write a function using `jax.lax.fori_loop` that computes $\psi P^t$ for a given initial distribution $\psi$ and transition matrix $P$, returning the distribution at each time step. Compare the performance with a pure Python loop.
+Write a function using `jax.lax.fori_loop` that computes $\psi P^t$ for a given initial distribution $\psi$ and transition matrix $P$, returning the distribution at each time step.
+
+Compare the performance with a pure Python loop.
 ```
 
 ```{solution-start} mc-jax-ex2
