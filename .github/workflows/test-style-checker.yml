@@ -57,9 +57,14 @@ jobs:
   test-comment:
     if: >
       github.event_name == 'issue_comment' &&
-      contains(github.event.comment.body, '@qe-style-checker')
+      contains(github.event.comment.body, '@qe-style-checker') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
     steps:
       - name: Checkout test repository
         uses: actions/checkout@v7
