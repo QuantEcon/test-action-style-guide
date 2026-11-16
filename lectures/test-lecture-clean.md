@@ -88,13 +88,13 @@ Our analysis reveals several important findings.
 :label: thm-convergence
 
 Under assumptions A1-A3, the value function iteration converges to the unique fixed point
-$V^*$ at a geometric rate with factor $\beta$.
+$V^*$ at a geometric rate with factor β.
 ```
 
 See {prf:ref}`thm-convergence` for the formal statement of convergence.
 
 ```{note}
-The convergence rate depends on the discount factor. Higher values of $\beta$ lead to
+The convergence rate depends on the discount factor. Higher values of β lead to
 slower convergence but more accurate long-run predictions.
 ```
 
