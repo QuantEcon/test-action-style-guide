@@ -17,10 +17,11 @@ This lecture demonstrates proper style that should pass all checks in the QuantE
 
 ## Overview
 
-This lecture covers fundamental concepts in computational economics. The reader will learn
-about numerical methods and their applications to economic models.
+This lecture covers fundamental concepts in computational economics.
 
-## Mathematical Foundations
+The reader will learn about numerical methods and their applications to economic models.
+
+## Mathematical foundations
 
 We begin with the key equation for our analysis.
 
@@ -29,14 +30,14 @@ We begin with the key equation for our analysis.
 V(x) = \max_{a \in A} \left\{ u(x, a) + \beta \sum_{x'} p(x' | x, a) V(x') \right\}
 ```
 
-Equation {eq}`eq-bellman` is the Bellman equation, which forms the foundation of dynamic programming.
-The discount factor $\beta \in (0, 1)$ determines how much the agent values future rewards relative
-to current rewards.
+Equation {eq}`eq-bellman` is the **Bellman equation**, which forms the foundation of dynamic programming.
+
+The discount factor $\beta \in (0, 1)$ determines how much the agent values future rewards relative to current rewards.
 
 For a simple linear model, we have $y = \alpha + \beta x + \varepsilon$, where $\varepsilon$ is
-the error term with $E[\varepsilon] = 0$.
+the **error term** with $E[\varepsilon] = 0$.
 
-## Code Implementation
+## Code implementation
 
 The following code implements our numerical solution.
 
@@ -80,7 +81,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Key Results
+## Key results
 
 Our analysis reveals several important findings.
 
@@ -94,15 +95,16 @@ $V^*$ at a geometric rate with factor $\beta$.
 See {prf:ref}`thm-convergence` for the formal statement of convergence.
 
 ```{note}
-The convergence rate depends on the discount factor. Higher values of $\beta$ lead to
-slower convergence but more accurate long-run predictions.
+The convergence rate depends on the discount factor.
+
+Higher values of $\beta$ lead to slower convergence but more accurate long-run predictions.
 ```
 
-## Practical Considerations
+## Practical considerations
 
 When implementing these methods, practitioners should consider computational efficiency.
-The algorithm complexity scales with the size of the state space, making careful
-discretization essential for large problems.
+
+The algorithm complexity scales with the size of the state space, making careful discretization essential for large problems.
 
 ```{tip}
 Start with a coarse grid to verify the code works correctly, then refine the
@@ -112,6 +114,7 @@ discretization for production runs.
 ## Summary
 
 This lecture introduced the Bellman equation and demonstrated a basic implementation.
+
 The key takeaways are:
 
 1. Dynamic programming provides a systematic approach to sequential decision problems
